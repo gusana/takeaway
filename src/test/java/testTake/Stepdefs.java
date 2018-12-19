@@ -8,16 +8,13 @@ import cucumber.api.java.en.When;
 import cucumber.api.java.en.Then;
 
 import org.openqa.selenium.*;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
-import org.testng.Assert;
 
 public class Stepdefs extends BaseTest {
 
     WebDriver driver;
     WebDriverWait wait;
-    mainPage page;
+    mainPage page ;
     Steps steps;
 
     public void setUP(String browser)
@@ -39,89 +36,69 @@ public class Stepdefs extends BaseTest {
     public void user_navigates_to(String url){
         setUP("chrome");
         getLink(url);
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("imysearchstring")));
+        steps.waitForLoad();
     }
 
     @When("^User puts index \"(.*)\"$")
     public void user_puts_index(String index) {
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("imysearchstring")));
-        page.filterField.clear();
-        page.filterField.sendKeys(index);
-        page.filterField.click();
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div.autoCompleteDropDown")));
-    }
+        steps.putIdexToSearchField(index);
+       }
 
     @Then("^User presses Find button$")
     public void user_presses_Find_button(){
-        page.title.click();
-        page.submitButton.click();
+        steps.pressFindButton();
     }
 
     @When("^User clicks on title$")
     public void pressTitle(){
-        page.title.click();
+        steps.pressOnTitle();
     }
 
     @Then("^User sees error message \"(.*)\"$")
     public void errorMessageIsOnPage(String errorMessage){
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#ideliveryareaerror")));
-        Assert.assertEquals(page.messageWithError.getText(), errorMessage,
-                "There is another error message on main page");
+      steps.checkErrorMessageOnPage(errorMessage);
     }
 
     @Then("^Page with offers is shown$")
     public void page_with_offers_is_shown() {
-        if(page.addressOnPage.isDisplayed()){
-            Assert.assertTrue(page.addressOnPage.getText().toLowerCase().contains(addressFromList.toLowerCase()),
-                    "There is another address on page with results");
-        }
-
+        steps.checkPageWithOffers(addressFromList);
         }
 
     @Then("^User chooses from drop-down list$")
     public void chooseFromDropList() {
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("iautoCompleteDropDownContent")));
-        wait.until(ExpectedConditions
-                .visibilityOfElementLocated(By.cssSelector("#iautoCompleteDropDownContent > a.item.selected > span")));
-        page.firstElement.click();
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("span.atom-dropdown-text")));
+       steps.choosingFromlist();
     }
 
     @Then("^User presses Enter button$")
     public void pressEnter(){
-        page.filterField.sendKeys(Keys.ENTER);
+        steps.pressEnterButton();
     }
 
     @Then("^Message \"(.*)\" should be shown$")
     public void errorMessageShown(String erMessage) {
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div.suggestions-location")));
-        Assert.assertEquals(page.errorMessage.getText(), erMessage, "Here is another error message");
+       steps.errorMessageIsShown(erMessage);
     }
 
 
     @Then("^User chooses not first address from the list$")
     public void chooseNotFirstElement(){
-        page.notFirstElement.click();
-        addressFromList = page.notFirstElement.getText();
+       steps.chooseNotFirst();
+       addressFromList = steps.getText();
     }
 
     @Then("^Addresses with this number should be shown$")
     public void listOfAdressesShown(){
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("iautoCompleteDropDownContent")));
-        Assert.assertTrue(steps.checkAddressesInList(addressFromList),
-                "Drop-down list has not address from Search field");
+       steps.checkListOfAddresses(addressFromList);
     }
 
     @Then("^Address \"(.*)\" will be shown on page$")
     public void addressIsShown(String expectedAddress) {
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("span.atom-dropdown-text")));
-        Assert.assertTrue(page.addressOnPage.getText().contains(expectedAddress), "On page is another address");
+        steps.checkAddress(expectedAddress);
     }
 
     @Then("^Certain restaurant \"(.*)\" should be on the page$")
     public void findCertainPlace(String place) {
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("irestaurantlist")));
-        Assert.assertTrue(steps.checkRestaurant(place), "There is no such restaurant on page" );
+       steps.checkPlace(place);
     }
 
     @After

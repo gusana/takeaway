@@ -80,6 +80,7 @@ public class BaseTest {
         return driver;
     }
 
+
     public static void setRestartFreq(final int newRestartFreq){
         restartFreq = newRestartFreq;
     }
